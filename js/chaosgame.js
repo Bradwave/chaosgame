@@ -136,11 +136,11 @@ const toScreenCoordinates = (p) => {
   );
 }
 
-const calcNewPoint = (p) => {
-  const calcNewCoordinate = (c1, c2) => {
-    return c1 * chaosFactor + (1 - chaosFactor) * c2;
-  }
+const calcNewCoordinate = (c1, c2) => {
+  return c1 * chaosFactor + (1 - chaosFactor) * c2;
+}
 
+const calcNewPoint = (p) => {
   const chosenPoint = figureVertices[chooseRandomIndex()];
   p.x = calcNewCoordinate(p.x, chosenPoint.x);
   p.y = calcNewCoordinate(p.y, chosenPoint.y);
@@ -148,23 +148,25 @@ const calcNewPoint = (p) => {
   return p;
 }
 
+const removedIndexes = () => {
+  let removedIndexes = [];
+
+  if (!ignoreRemoved && previousIndexes.slice(startEqual, endEqual).every(v => v === previousIndexes[0])) {
+    removedIndexes = [
+      (previousIndexes[compareIndex] + removedDistance) % numberOfPoints,
+      (numberOfPoints + (previousIndexes[compareIndex] - removedDistance) % numberOfPoints) % numberOfPoints
+    ];
+  }
+
+  return removedIndexes.concat(previousIndexes.slice(0, preventPrevious));
+}
+
 const chooseRandomIndex = () => {
   let availableIndexes = [...Array(numberOfPoints).keys()].filter(
     function (e) {
       return this.indexOf(e) < 0;
     },
-    (() => {
-      let removedIndexes = [];
-
-      if (!ignoreRemoved && previousIndexes.slice(startEqual, endEqual).every(v => v === previousIndexes[0])) {
-        removedIndexes = [
-          (previousIndexes[compareIndex] + removedDistance) % numberOfPoints,
-          (numberOfPoints + (previousIndexes[compareIndex] - removedDistance) % numberOfPoints) % numberOfPoints
-        ];
-      }
-
-      return removedIndexes.concat(previousIndexes.slice(0, preventPrevious));
-    })()
+    removedIndexes()
   );
 
   let newIndex = availableIndexes[Math.floor(Math.random() * (availableIndexes.length))];
