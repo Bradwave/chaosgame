@@ -1,22 +1,16 @@
 /**
  * Geometry
  */
-let xOrigin;
-let yOrigin;
+let cartesianOrigin;
 
-let scaleFactor = 100.000000;
-let descaleFactor = 1.000000 / scaleFactor;
+let pixelsPerUnit = 100.000000;
+let unitsPerPixel = 1.000000 / pixelsPerUnit;
 
 /**
  * Main figure
  */
 const numberOfPoints = 5;
-let points = [];
-
-/**
- * Chaos factor
- */
-const chaosFactor = 0.5;
+let figureVertices = [];
 
 /**
  * Starting point
@@ -26,6 +20,7 @@ let p;
 /**
  * Rules
  */
+const chaosFactor = 0.5;
 let previousIndexes = [];
 const preventPrevious = 0;
 const startEqual = 0;
@@ -37,98 +32,120 @@ const ignoreRemoved = Math.abs(endEqual - startEqual) == 1;
 /**
  * Style
  */
-const pointWidth = .1;
-const drawingSpeed = 500;
+const pointWidth = 1;
+const pointColor = "#ffffff20"
+const drawingSpeed = 10000;
 
-let iterationCounter = 0;
+let iterationCounter = 1000;
+let running = true;
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
+let canvas, ctx;
 
-  // noLoop();
-
-  resetView();
+class point {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
 }
 
-function createFigure(numberOfPoints) {
-  points = [];
-  for (let i = 0; i < numberOfPoints; i++) {
-    const angle = i / numberOfPoints * TWO_PI + ((numberOfPoints % 2 == 0) ? PI / (numberOfPoints) : HALF_PI);
-    const figurePoint = createVector(Math.cos(angle), Math.sin(angle));
-    points.push(toScreenCoordinates(figurePoint));
-  }
+window.onload = () => {
+  canvas = document.getElementById('chaos-canvas');
+  ctx = canvas.getContext('2d');
+
+  resetView();
+  drawNewPoints();
+}
+
+window.onresize = () => {
+  resetView();
+  running = false;
+  waitTimeout = setTimeout(() => {
+    running = true;
+    drawNewPoints();
+  }, 500)
 }
 
 function resetView() {
-  setOrigin();
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-  p = createVector(width / 2, height / 2);
-  createFigure(numberOfPoints);
+  (() => {
+    let minDim = Math.min(width, height);
 
-  background(0);
+    cartesianOrigin = new point(
+      width * 0.5,
+      height * 0.5
+    );
 
-  stroke(255);
-  strokeWeight(5);
-  points.forEach(p => point(p));
+    pixelsPerUnit = Math.round(minDim / 2.2);
+    unitsPerPixel = 1.000000 / pixelsPerUnit;
+  })();
 
-  strokeWeight(pointWidth);
+  (() => {
+    figureVertices = [];
+    for (let i = 0; i < numberOfPoints; i++) {
+      const angle = i / numberOfPoints * Math.PI * 2 + ((numberOfPoints % 2 == 0) ? Math.PI / (numberOfPoints) : Math.PI * 0.5);
+      figureVertices.push(toScreenCoordinates(new point(
+        Math.cos(angle),
+        Math.sin(angle)
+      )));
+    }
+  })()
 
-  iterationCounter = 0;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  p = new point(
+    width / 2,
+    height / 2
+  )
+
+  figureVertices.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+  });
+
+  ctx.fillStyle = pointColor;
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-
-  clear();
-  resetView();
+function drawNewPoints() {
+  if (iterationCounter-- * running > 0) {
+    let i = 0;
+    while (i++ < drawingSpeed) {
+      p = calcNewPoint(p);
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), pointWidth, pointWidth);
+    }
+    window.requestAnimationFrame(drawNewPoints)
+  }
 }
 
-function setOrigin() {
-  let minDim = min(width, height);
-
-  xOrigin = width * 0.5;
-  yOrigin = height * 0.5;
-
-  scaleFactor = minDim / 2.2;
-  descaleFactor = 1.000000 / scaleFactor;
-}
-
-function toCartesian(p) {
-  let cx = (p.x - xOrigin) * descaleFactor;
-  let cy = (yOrigin - p.y) * descaleFactor;
-  return createVector(cx, cy);
-}
-
-function toScreenCoordinates(p) {
-  let sx = p.x * scaleFactor + xOrigin;
-  let sy = yOrigin - p.y * scaleFactor;
-  return createVector(sx, sy);
-}
-
-const calcNewCoordinate = (c1, c2) => {
-  return c1 * chaosFactor + (1 - chaosFactor) * c2;
-}
-
-const calcNewPoint = () => {
-  const chosenPoint = points[chooseRandomIndex()];
-  p = createVector(
-    calcNewCoordinate(p.x, chosenPoint.x),
-    calcNewCoordinate(p.y, chosenPoint.y)
+const toCartesian = (p) => {
+  return new point(
+    (p.x - cartesianOrigin.x) * unitsPerPixel,
+    (cartesianOrigin.y - p.y) * unitsPerPixel
   );
-  return p;
 }
 
-const removedIndexes = () => {
-  let removedIndexes = [];
+const toScreenCoordinates = (p) => {
+  return new point(
+    p.x * pixelsPerUnit + cartesianOrigin.x,
+    cartesianOrigin.y - p.y * pixelsPerUnit
+  );
+}
 
-  if (!ignoreRemoved && previousIndexes.slice(startEqual, endEqual).every(v => v === previousIndexes[0])) {
-    removedIndexes = [
-      (previousIndexes[compareIndex] + removedDistance) % numberOfPoints,
-      (numberOfPoints + (previousIndexes[compareIndex] - removedDistance) % numberOfPoints) % numberOfPoints
-    ];
+const calcNewPoint = (p) => {
+  const calcNewCoordinate = (c1, c2) => {
+    return c1 * chaosFactor + (1 - chaosFactor) * c2;
   }
 
-  return removedIndexes.concat(previousIndexes.slice(0, preventPrevious));
+  const chosenPoint = figureVertices[chooseRandomIndex()];
+  p.x = calcNewCoordinate(p.x, chosenPoint.x);
+  p.y = calcNewCoordinate(p.y, chosenPoint.y);
+
+  return p;
 }
 
 const chooseRandomIndex = () => {
@@ -136,27 +153,24 @@ const chooseRandomIndex = () => {
     function (e) {
       return this.indexOf(e) < 0;
     },
-    removedIndexes()
+    (() => {
+      let removedIndexes = [];
+
+      if (!ignoreRemoved && previousIndexes.slice(startEqual, endEqual).every(v => v === previousIndexes[0])) {
+        removedIndexes = [
+          (previousIndexes[compareIndex] + removedDistance) % numberOfPoints,
+          (numberOfPoints + (previousIndexes[compareIndex] - removedDistance) % numberOfPoints) % numberOfPoints
+        ];
+      }
+
+      return removedIndexes.concat(previousIndexes.slice(0, preventPrevious));
+    })()
   );
 
   let newIndex = availableIndexes[Math.floor(Math.random() * (availableIndexes.length))];
 
   previousIndexes.unshift(newIndex);
-
-  if (previousIndexes.length > numberOfPoints) {
-    previousIndexes.pop();
-  }
+  if (previousIndexes.length > numberOfPoints) previousIndexes.pop();
 
   return newIndex;
-}
-
-function drawNewPoint() {
-  point(calcNewPoint());
-}
-
-function draw() {
-  [...Array(drawingSpeed)].forEach(() => drawNewPoint())
-
-  if (iterationCounter++ > 1000)
-    noLoop();
 }
