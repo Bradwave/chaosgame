@@ -11,32 +11,43 @@
     background: #B01A00;
 }
 
-span.settings-dot {
+a.settings-dot {
     display: inline-block;
     height: 10px;
     width: 10px;
     background-color: #00000000;
     border: 3.5px solid #6e6e6e;
     border-radius: 50%;
-    transition: all .1s ease-in-out;
+    transition: all .15s ease-in-out;
 }
 
-span.settings-dot:hover {
+a.settings-dot:hover {
     border-color: #000000;
-    background-color: #d43417;
+    background-color: #B01A00;
     cursor: pointer;
 }
 
-span.reload {
+a.settings-dot:active {
+    border-color: #000000;
+    background-color: #d43417;
+}
+
+a.reload {
     margin-left: 10px;
     color: #6e6e6e;
     font-family: 'Roboto Mono', monospace;
     font-size: 24px;
+    transition: all .15s ease-in-out;
 }
 
-span.reload:hover {
-    color: #d43417;
+a.reload:hover {
+    color: #B01A00;
     cursor: pointer;
+    font-weight: bold;
+}
+
+a.reload:active {
+    color: #d43417;
 }
 
 div.controls {
@@ -47,6 +58,15 @@ div.controls {
     top: 0;
     z-index: 10;
     padding: 20px;
+}
+
+.non-selectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .side-nav {

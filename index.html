@@ -21,13 +21,13 @@
 
 <body style="display: block; padding: 0; margin: 0; overflow: hidden; background-color: #000000;">
 
-    <div class="controls">
-        <span class="settings-dot" onclick="toggleSettings()"></span>
-        <span class="reload" onclick="resetRender()">&#8635;</span>
+    <div class="controls non-selectable">
+        <a class="settings-dot" onclick="toggleSettings()"></a>
+        <a class="reload" onclick="resetRender()">&#8635;</a>
     </div>
 
     <div id="settings-panel" class="side-nav">
-        <div>
+        <div style="margin-top: 5px;">
             <span class="text">
                 # vertices:
                 <input id="vertices" class="inc" type="text" maxlength="2" value="5"
