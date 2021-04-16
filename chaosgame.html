@@ -7,10 +7,103 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" href=""> -->
+    <link rel="stylesheet" href="css/chaosgame.css">
 </head>
 
-<body style="display: block; padding: 0; margin: 0; overflow: hidden;">
+<body style="display: block; padding: 0; margin: 0; overflow: hidden; background-color: #000000;">
+
+    <div class="controls">
+        <span class="settings-dot" onclick="toggleSettings()"></span>
+        <span class="reload" onclick="resetRender()">&#8635;</span>
+    </div>
+
+    <div id="settings-panel" class="side-nav">
+        <div>
+            <span class="text">
+                # vertices:
+                <input id="vertices" class="inc" type="text" maxlength="2" value="5"
+                    onchange="changeFigure(this.value);">
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="text">
+                prevent previous
+                <input id="preventPrevious" class="inc" type="text" maxlength="2" value="0"
+                    onchange="changeRules(this.value, this.id);">
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="text">
+                if previous
+                <input id="endEqual" class="inc" type="text" maxlength="2" value="2"
+                    onchange="changeRules(this.value, this.id);">
+                are =,
+            </span>
+            <br>
+            <span class="text">
+                can't be placed
+                <input id="removedDistance" class="inc" type="text" maxlength="2" value="1"
+                    onchange="changeRules(this.value, this.id);">
+            </span>
+            away
+            <span class="text">
+                <br>
+                from previous
+                <input id="compareIndex" class="inc" type="text" maxlength="2" value="1"
+                    onchange="changeRules(this.value, this.id);">
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="text">
+                factor:
+                <input id="chaosFactor" class="inc" type="text" maxlength="4" value="0.5" style="width: 30px;"
+                    onchange="changeRules(this.value, this.id);">
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span class="text">
+                point width:
+                <input id="pointWidth" class="inc" type="text" maxlength="4" value="0.1" style="width: 30px;"
+                    onchange="changeStyle(this.value, this.id);">
+            </span>
+            <br>
+            <span class="text">
+                iterations:
+                <input id="iterations" class="inc" type="text" maxlength="7" value="1000" style="width: 60px;"
+                    onchange="changeStyle(this.value, this.id);">
+            </span>
+            <br>
+            <span class="text">
+                pts per iteration:
+                <input id="drawingSpeed" class="inc" type="text" maxlength="4" value="500" style="width: 35px;"
+                    onchange="changeStyle(this.value, this.id);">
+            </span>
+        </div>
+        <div style="margin-top: 10px;">
+
+        </div>
+    </div>
+
+    <div id="main" style="position: absolute; top: 0">
+
+    </div>
+
+    <script>
+        let settingsOpen = true;
+
+        var sideNav = document.getElementById("settings-panel");
+        var main = document.getElementById("main");
+
+        function toggleSettings() {
+            if (!settingsOpen) {
+                settingsOpen = true;
+                sideNav.style.left = "0";
+            } else {
+                settingsOpen = false;
+                sideNav.style.left = "-350px";
+            }
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/p5@1.3.1/lib/p5.js"></script>
     <script src="js/chaosgame.js"></script>
