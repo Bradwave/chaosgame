@@ -9,7 +9,7 @@ let unitsPerPixel = 1.000000 / pixelsPerUnit;
 /**
  * Main figure
  */
-const numberOfPoints = 5;
+const numberOfPoints = 6;
 let figureVertices = [];
 
 /**
@@ -36,8 +36,8 @@ const pointWidth = 1;
 const pointColor = "#ffffff20"
 const drawingSpeed = 10000;
 
-let iterationCounter = 1000;
-let running = true;
+let iterationCounter = 200;
+let runningTimer = true;
 
 let canvas, ctx;
 
@@ -48,21 +48,79 @@ class point {
   }
 }
 
+/**
+ * Rendering
+ */
+
+function FpsCtrl(fps, callback) {
+
+  var delay = 1000 / fps,                               // calc. time per frame
+    time = null,                                      // start time
+    frame = -1,                                       // frame count
+    tref;                                             // rAF time reference
+
+  function loop(timestamp) {
+    if (time === null) time = timestamp;              // init start time
+    var seg = Math.floor((timestamp - time) / delay); // calc frame no.
+    if (seg > frame) {                                // moved to next frame?
+      frame = seg;                                  // update
+      callback({                                    // callback function
+        time: timestamp,
+        frame: frame
+      })
+    }
+    tref = requestAnimationFrame(loop)
+  }
+
+  // play status
+  this.isPlaying = false;
+
+  // set frame-rate
+  this.frameRate = function (newFps) {
+    if (!arguments.length) return fps;
+    fps = newFps;
+    delay = 1000 / fps;
+    frame = -1;
+    time = null;
+  };
+
+  // enable starting/pausing of the object
+  this.start = function () {
+    if (!this.isPlaying) {
+      this.isPlaying = true;
+      tref = requestAnimationFrame(loop);
+    }
+  };
+
+  this.pause = function () {
+    if (this.isPlaying) {
+      cancelAnimationFrame(tref);
+      this.isPlaying = false;
+      time = null;
+      frame = -1;
+    }
+  };
+}
+
+var fc;
+
 window.onload = () => {
   canvas = document.getElementById('chaos-canvas');
   ctx = canvas.getContext('2d');
 
   resetView();
-  drawNewPoints();
+  fc = new FpsCtrl(24, function () {
+    drawNewPoints();
+  });
+  fc.start();
 }
 
 window.onresize = () => {
   resetView();
-  running = false;
-  waitTimeout = setTimeout(() => {
-    running = true;
-    drawNewPoints();
-  }, 500)
+  window.cancelAnimationFrame(runningTimer);
+
+  fc.pause();
+  setTimeout(() => { fc.start() }, 500);
 }
 
 function resetView() {
@@ -109,16 +167,16 @@ function resetView() {
   });
 
   ctx.fillStyle = pointColor;
+  iterationCounter = 200;
 }
 
 function drawNewPoints() {
-  if (iterationCounter-- * running > 0) {
+  if (iterationCounter-- > 0) {
     let i = 0;
     while (i++ < drawingSpeed) {
       p = calcNewPoint(p);
       ctx.fillRect(Math.round(p.x), Math.round(p.y), pointWidth, pointWidth);
     }
-    window.requestAnimationFrame(drawNewPoints)
   }
 }
 
