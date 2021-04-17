@@ -111,7 +111,7 @@ function changeStyle(newValue, id) {
       break;
     default:
   }
-  
+
   resetRender();
 }
 
@@ -194,14 +194,13 @@ const calcNewCoordinate = (c1, c2) => {
 
 const calcNewPoint = () => {
   const chosenPoint = points[chooseRandomIndex()];
-  newPoint = createVector(
-    calcNewCoordinate(newPoint.x, chosenPoint.x),
-    calcNewCoordinate(newPoint.y, chosenPoint.y)
-  );
-  return newPoint;
+  return {
+    x: calcNewCoordinate(newPoint.x, chosenPoint.x),
+    y: calcNewCoordinate(newPoint.y, chosenPoint.y)
+  }
 }
 
-const removedIndexes = () => {
+const chooseRandomIndex = () => {
   let removedIndexes = [];
 
   if (!ignoreRemoved && previousIndexes.slice(startEqual, endEqual).every(v => v === previousIndexes[0])) {
@@ -211,20 +210,17 @@ const removedIndexes = () => {
     ];
   }
 
-  return removedIndexes.concat(previousIndexes.slice(0, preventPrevious));
-}
+  removedIndexes.push(...previousIndexes.slice(0, preventPrevious));
 
-const chooseRandomIndex = () => {
   let availableIndexes = [...Array(numberOfPoints).keys()].filter(
     function (e) {
       return this.indexOf(e) < 0;
     },
-    removedIndexes()
+    removedIndexes
   );
 
   let newIndex = availableIndexes[Math.floor(Math.random() * (availableIndexes.length))];
-
-  previousIndexes.unshift(newIndex);
+  previousIndexes = [newIndex, ...previousIndexes];
 
   if (previousIndexes.length > numberOfPoints) {
     previousIndexes.pop();
@@ -235,6 +231,9 @@ const chooseRandomIndex = () => {
 
 function draw() {
   let j = drawingSpeed;
-  while (j-- > 0) point(calcNewPoint())
+  while (j-- > 0) {
+    newPoint = calcNewPoint();
+    point(newPoint.x , newPoint.y);
+  }
   if (iterationCounter-- < 1) noLoop();
 }
