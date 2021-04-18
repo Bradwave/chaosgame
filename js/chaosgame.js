@@ -1,3 +1,5 @@
+// I know, it's a mess. I need to clean the global namespace.
+
 /**
  * Geometry
  */
@@ -11,11 +13,6 @@ let unitsPerPixel = 1.000000 / pixelsPerUnit;
  */
 let numberOfPoints = 5;
 let points = [];
-
-/**
- * Chaos factor
- */
-let chaosFactor = 0.5;
 
 /**
  * Starting point
@@ -34,6 +31,11 @@ let removedDistance = 1;
 let ignoreRemoved = Math.abs(endEqual - startEqual) == 1;
 
 /**
+ * Chaos factor
+ */
+let chaosFactor = 0.5;
+
+/**
  * Style
  */
 let pointWidth = .1;
@@ -42,11 +44,8 @@ let drawingSpeed = 500;
 let iterations = 1000;
 let iterationCounter = iterations;
 
-/**
- * HTML elements
- */
-let htmlElements;
-
+// There are two almost identical functions because I couldn't figure out a weird bug.
+// Send help!
 const convertValueInt = (givenValue, minValue, maxValue, defaultValue, id) => {
   givenValue = Math.round(parseInt(givenValue));
   givenValue = isNaN(givenValue) ? defaultValue : (
@@ -233,7 +232,7 @@ function draw() {
   let j = drawingSpeed;
   while (j-- > 0) {
     newPoint = calcNewPoint();
-    point(newPoint.x , newPoint.y);
+    point(newPoint.x, newPoint.y);
   }
   if (iterationCounter-- < 1) noLoop();
 }

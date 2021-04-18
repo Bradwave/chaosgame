@@ -21,70 +21,87 @@
 
 <body style="display: block; padding: 0; margin: 0; overflow: hidden; background-color: #000000;">
 
+    <!-- Controls -->
     <div class="controls non-selectable">
-        <a class="settings-dot" onclick="toggleSettings()"></a>
-        <a class="reload" onclick="resetRender()">&#8635;</a>
+
+        <!-- Settings Dot -->
+        <span class="control-button settings-dot" tabindex="0" onclick="toggleSettings()"></span>
+
+        <!-- Reload -->
+        <span style="margin-left: 10px;">
+            <span class="control-button reload" onclick="resetRender()">
+                &#8635;
+            </span>
+        </span>
+
     </div>
 
+    <!-- Settings Menu Panel -->
     <div id="settings-panel" class="side-nav">
+
+        <!-- Figure -->
         <div style="margin-top: 5px;">
             <span class="text">
                 # vertices:
-                <input id="vertices" class="inc" type="text" maxlength="2" value="5"
+                <input id="vertices" class="input-box" type="text" maxlength="2" value="5"
                     onchange="changeFigure(this.value);">
             </span>
         </div>
+
+        <!-- Rules -->
         <div style="margin-top: 10px;">
             <span class="text">
                 prevent previous
-                <input id="preventPrevious" class="inc" type="text" maxlength="2" value="0"
+                <input id="preventPrevious" class="input-box" type="text" maxlength="2" value="0"
                     onchange="changeRules(this.value, this.id);">
             </span>
         </div>
         <div style="margin-top: 10px;">
             <span class="text">
                 if previous
-                <input id="endEqual" class="inc" type="text" maxlength="2" value="2"
+                <input id="endEqual" class="input-box" type="text" maxlength="2" value="2"
                     onchange="changeRules(this.value, this.id);">
                 are =,
             </span>
             <br>
             <span class="text">
                 can't be placed
-                <input id="removedDistance" class="inc" type="text" maxlength="2" value="1"
+                <input id="removedDistance" class="input-box" type="text" maxlength="2" value="1"
                     onchange="changeRules(this.value, this.id);">
             </span>
             away
             <span class="text">
                 <br>
                 from previous
-                <input id="compareIndex" class="inc" type="text" maxlength="2" value="1"
+                <input id="compareIndex" class="input-box" type="text" maxlength="2" value="1"
                     onchange="changeRules(this.value, this.id);">
             </span>
         </div>
         <div style="margin-top: 10px;">
             <span class="text">
                 factor:
-                <input id="chaosFactor" class="inc" type="text" maxlength="4" value="0.5" style="width: 30px;"
+                <input id="chaosFactor" class="input-box" type="text" maxlength="4" value="0.5" style="width: 30px;"
                     onchange="changeRules(this.value, this.id);">
             </span>
         </div>
+
+        <!-- Style-->
         <div style="margin-top: 10px;">
             <span class="text">
                 point width:
-                <input id="pointWidth" class="inc" type="text" maxlength="4" value="0.1" style="width: 30px;"
+                <input id="pointWidth" class="input-box" type="text" maxlength="4" value="0.1" style="width: 30px;"
                     onchange="changeStyle(this.value, this.id);">
             </span>
             <br>
             <span class="text">
                 iterations:
-                <input id="iterations" class="inc" type="text" maxlength="7" value="1000" style="width: 60px;"
+                <input id="iterations" class="input-box" type="text" maxlength="7" value="1000" style="width: 60px;"
                     onchange="changeStyle(this.value, this.id);">
             </span>
             <br>
             <span class="text">
                 pts per iteration:
-                <input id="drawingSpeed" class="inc" type="text" maxlength="4" value="500" style="width: 35px;"
+                <input id="drawingSpeed" class="input-box" type="text" maxlength="4" value="500" style="width: 35px;"
                     onchange="changeStyle(this.value, this.id);">
             </span>
         </div>
@@ -93,24 +110,15 @@
         </div>
     </div>
 
-    <div id="main" style="position: absolute; top: 0">
-
-    </div>
+    <!-- Canvas Container -->
+    <div id="main" style="position: absolute; top: 0"></div>
 
     <script>
         let settingsOpen = true;
 
-        var sideNav = document.getElementById("settings-panel");
-        var main = document.getElementById("main");
-
         function toggleSettings() {
-            if (!settingsOpen) {
-                settingsOpen = true;
-                sideNav.style.left = "0";
-            } else {
-                settingsOpen = false;
-                sideNav.style.left = "-350px";
-            }
+            settingsOpen = !settingsOpen;
+            document.getElementById("settings-panel").style.left = settingsOpen ? "0" : "-350px";
         }
     </script>
 
